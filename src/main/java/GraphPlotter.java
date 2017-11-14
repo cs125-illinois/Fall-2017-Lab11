@@ -16,9 +16,6 @@ import javax.swing.JPanel;
  */
 public class GraphPlotter extends JPanel {
 
-    /** Number of Y values to plot. */
-    private int dataSize = 0;
-
     /** Data to plot. */
     private int[] data;
 
@@ -31,11 +28,7 @@ public class GraphPlotter extends JPanel {
      * @param yValues holds the Y values
      */
     public GraphPlotter(final int[] yValues) {
-        dataSize = Math.min(yValues.length, data.length);
-        data = new int[dataSize];
-        for (int i = 0; i < dataSize; i++) {
-            data[i] = yValues[i];
-        }
+        data = yValues.clone();
     }
 
     /**
@@ -87,12 +80,12 @@ public class GraphPlotter extends JPanel {
         g2.drawString(s, sx, sy);
 
         // Draw lines between consecutive data points (x1,y1) and (x2,y2)
-        double xinterval = (double) (w - 2 * DEFAULT_PADDING) / (dataSize - 1);
+        double xinterval = (double) (w - 2 * DEFAULT_PADDING) / (data.length - 1);
         double scale = (double) (h - 2 * DEFAULT_PADDING) / getMax();
 
         // Set the color of the line
         g2.setPaint(Color.blue.darker());
-        for (int i = 0; i < dataSize - 1; i++) {
+        for (int i = 0; i < data.length - 1; i++) {
             // ith point
             double x1 = DEFAULT_PADDING + i * xinterval;
             double y1 = h - DEFAULT_PADDING - scale * data[i];
@@ -107,7 +100,7 @@ public class GraphPlotter extends JPanel {
 
         // Mark data points on the graph
         g2.setPaint(Color.red);
-        for (int i = 0; i < dataSize; i++) {
+        for (int i = 0; i < data.length; i++) {
             // Prepare the co-ordinates of the ith point
             double x = DEFAULT_PADDING + i * xinterval;
             double y = h - DEFAULT_PADDING - scale * data[i];
@@ -123,7 +116,7 @@ public class GraphPlotter extends JPanel {
      */
     private int getMax() {
         int max = -Integer.MAX_VALUE;
-        for (int i = 0; i < dataSize; i++) {
+        for (int i = 0; i < data.length; i++) {
             if (data[i] > max) {
                 max = data[i];
             }

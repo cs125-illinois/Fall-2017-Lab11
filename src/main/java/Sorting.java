@@ -13,17 +13,47 @@ import javax.swing.JFrame;
 
 public class Sorting {
 
+    /** Increment to sweep the sort. */
+    private static final int SORT_INCREMENT = 10000;
+
+    /** Total number of values to try. */
+    private static final int TOTAL_SORT_VALUES = 100;
+
+    /** Total data size. */
+    private static final int TOTAL_INTEGER_VALUES = 1000000;
+
     /**
-     * Bubble sorting algorithm that runs in O(n^2).
+     * Bubble sort.
      *
-     * @param arr unsorted input array
-     * @param n size of the input
+     * @param array unsorted input array
+     * @return the sorted array, or null on failure
      */
-    static void bubbleSort(final int[] arr, final int n) {
+    static int[] bubbleSort(final int[] array) {
+        return null;
     }
 
     /**
-     * Merge function that merges two sorted arrays into a single sorted array.
+     * Selection sort.
+     *
+     * @param array unsorted input array
+     * @return the sorted array, or null on failure
+     */
+    static int[] selectionSort(final int[] array) {
+        return null;
+    }
+
+    /**
+     * Merge sort.
+     *
+     * @param array array that needs to be sorted
+     * @return the sorted array, or null on failure
+     */
+    static int[] mergeSort(final int[] array) {
+        return null;
+    }
+
+    /**
+     * Merge helper function that merges two sorted arrays into a single sorted array.
      * <p>
      * Implement an in place merge algorithm that repeatedly picks the smaller of two numbers from
      * "right" and "left" subarray and copies it to the "arr" array to produce a bigger sorted array
@@ -32,8 +62,9 @@ public class Sorting {
      * @param l start position of sorted left subarray
      * @param m ending position of sorted left and start position of sorted right subarray
      * @param r ending position of sorted right subarray
+     * @return the sorted array, or null on failure
      */
-    static void merge(final int[] arr, final int l, final int m, final int r) {
+    static int[] merge(final int[] arr, final int l, final int m, final int r) {
         int n1 = m - l + 1;
         int n2 = r - m;
 
@@ -48,25 +79,7 @@ public class Sorting {
         }
 
         /* TO DO: Merge left and right array here */
-    }
-
-    /**
-     * Merge sorting algorithm that runs in O(n log n).
-     *
-     * @param arr array that needs to be sorted
-     * @param l start position of unsorted array
-     * @param r ending position of unsorted subarray
-     */
-    static void mergeSort(final int[] arr, final int l, final int r) {
-    }
-
-    /**
-     * Selective sorting algorithm that runs in O(n^2).
-     *
-     * @param arr unsorted input array
-     * @param n size of the input
-     */
-    static void selectionSort(final int[] arr, final int n) {
+        return arr;
     }
 
     /**
@@ -83,12 +96,15 @@ public class Sorting {
     public static void main(final String[] unused)
             throws FileNotFoundException, URISyntaxException {
 
-        Scanner user = new Scanner(System.in);
+        /*
+         * Prompt for the input file.
+         */
+        Scanner userInput = new Scanner(System.in);
         String dataFilename = "";
         while (true) {
             System.out.println("Enter the type of data to sort "
                     + "(1 for sorted, 2 for almost sorted, 3 for reverse sorted): ");
-            int datatype = user.nextInt();
+            int datatype = userInput.nextInt();
             switch (datatype) {
                 case 1 :
                     dataFilename = "sorted.txt";
@@ -108,69 +124,82 @@ public class Sorting {
             }
         }
 
-        String numbers = null;
+        /*
+         * Load the input file.
+         */
         String numbersFilePath = //
                 Sorting.class.getClassLoader().getResource(dataFilename).getFile();
         numbersFilePath = new URI(numbersFilePath).getPath();
         File numbersFile = new File(numbersFilePath);
         Scanner numbersScanner = new Scanner(numbersFile, "UTF-8");
-
-        int totaln = 1000000;
-        int[] allnumbers = new int[totaln];
-        for (int i = 0; i < totaln; i++) {
+        int[] allnumbers = new int[TOTAL_INTEGER_VALUES];
+        for (int i = 0; i < TOTAL_INTEGER_VALUES; i++) {
             allnumbers[i] = numbersScanner.nextInt();
         }
         numbersScanner.close();
 
-        int[] timeValues = new int[100];
-
-        int alg;
+        /*
+         * Prompt for the algorithm to use.
+         */
+        int whichAlgorithm;
         while (true) {
             System.out.println("Enter the sorting algorithm that you want to use"
                     + " (1 for bubble sort, 2 for insertion sort, 3 for merge sort): ");
-            alg = user.nextInt();
-            if (alg > 0 && alg < 4) {
+            whichAlgorithm = userInput.nextInt();
+            if (whichAlgorithm > 0 && whichAlgorithm < 4) {
                 break;
             }
         }
 
-        for (int i = 1; i <= 100; i++) {
-            // Create a new array of 10000, 20000, 30000... integers to sort
-            int[] sortingarray = new int[i * 10000];
-            for (int j = 0; j < (i * 10000); j++) {
-                sortingarray[j] = allnumbers[j];
+        int[] timeValues = new int[TOTAL_SORT_VALUES];
+        boolean succeeded = true;
+        for (int i = 1; i <= TOTAL_SORT_VALUES; i++) {
+            /*
+             * Sweep in increments of SORT_INCREMENT. Copy the array first. Clone doesn't work here
+             * because we only want a certain number of values.
+             */
+            int[] unsortedArray = new int[i * SORT_INCREMENT];
+            for (int j = 0; j < (i * SORT_INCREMENT); j++) {
+                unsortedArray[j] = allnumbers[j];
             }
 
-            // Sort the array using algorithm specified by user
+            /*
+             * Sort the array using the algorithm requested. Measure and record the time taken.
+             */
+            int[] sortedArray;
             long startTime = System.currentTimeMillis();
-            switch (alg) {
+            switch (whichAlgorithm) {
                 case 1 :
-                    bubbleSort(sortingarray, (i * 10000));
+                    sortedArray = bubbleSort(unsortedArray);
                     break;
                 case 2 :
-                    selectionSort(sortingarray, (i * 10000));
+                    sortedArray = selectionSort(unsortedArray);
                     break;
                 default :
-                    mergeSort(sortingarray, 0, (i * 10000) - 1);
+                    sortedArray = mergeSort(unsortedArray);
                     break;
             }
+            if (sortedArray == null) {
+                succeeded = false;
+                break;
+            }
             long endTime = System.currentTimeMillis();
-
-            // Append the time taken to sort to the timeValues array
             timeValues[i - 1] = (int) (endTime - startTime);
         }
-        user.close();
+        userInput.close();
+
+        if (!succeeded) {
+            System.out.println("Sorting failed");
+            return;
+        }
 
         /*
-         * Plot a graph corresponding to the values in the timeValues array Graphics in Java has a
-         * Frame has the parent component which we initialize below
+         * Plot the results if the sorts succeeded.
          */
         JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.add(new GraphPlotter(timeValues));
-        // Sets the size of the frame
         f.setSize(400, 400);
-        // Location of the frame relative to the top-left part of the screen
         f.setLocation(200, 200);
         f.setVisible(true);
     }
